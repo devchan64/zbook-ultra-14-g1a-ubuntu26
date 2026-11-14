@@ -25,6 +25,7 @@ apt_install() {
 # 이미 등록된 공식 소스는 기존 키 설정과 함께 유지한다.
 apt_source() (
   local name="$1" uri="$2" suite="$3" key_url="$4" key_type="$5"
+  local component="${6:-main}"
   local source="/etc/apt/sources.list.d/$name.sources"
   local key="/etc/apt/keyrings/$name.gpg"
   [[ $key_type != asc ]] || key="/etc/apt/keyrings/$name.asc"
@@ -45,6 +46,6 @@ apt_source() (
   gpg --batch --show-keys "$work/key" >/dev/null
   sudo install -d -m 0755 /etc/apt/keyrings
   sudo install -m 0644 "$work/key" "$key"
-  printf 'Types: deb\nURIs: %s\nSuites: %s\nComponents: main\nArchitectures: amd64\nSigned-By: %s\n' \
-    "$uri" "$suite" "$key" | sudo tee "$source" >/dev/null
+  printf 'Types: deb\nURIs: %s\nSuites: %s\nComponents: %s\nArchitectures: amd64\nSigned-By: %s\n' \
+    "$uri" "$suite" "$component" "$key" | sudo tee "$source" >/dev/null
 )

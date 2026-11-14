@@ -10,7 +10,7 @@ main() (
     https://cli.github.com/packages/githubcli-archive-keyring.gpg gpg
   if [[ $# == 1 ]]; then
     apt_source docker https://download.docker.com/linux/ubuntu resolute \
-      https://download.docker.com/linux/ubuntu/gpg asc
+      https://download.docker.com/linux/ubuntu/gpg asc stable
   fi
 
   apt_update
