@@ -34,7 +34,8 @@ if [[ $domain == all ]]; then
   flock -n "$all_lock" || die '다른 전체 설치가 실행 중입니다.'
   for step in dev gnome security net-monitor ml codex-restart; do
     marker="$step"
-    [[ $step != dev ]] || marker=dev-snap
+    [[ $step != dev ]] || marker=dev-snap-docker
+    [[ $step != gnome ]] || marker=gnome-nord
     [[ ! -e /run/reboot-required ]] || die '재부팅 후 install.sh all을 다시 실행하세요.'
     if [[ -f $state_dir/all/$marker.done ]]; then
       log "완료된 단계 건너뜀: $step"
@@ -43,7 +44,11 @@ if [[ $domain == all ]]; then
     log "단계 실행: $step"
     (
       source "$root/scripts/cmd/$step.sh"
-      main
+      if [[ $step == dev ]]; then
+        main --docker
+      else
+        main
+      fi
     )
     touch "$state_dir/all/$marker.done"
   done
