@@ -14,7 +14,14 @@ main() {
   uuid="$(gsettings get org.gnome.Terminal.ProfilesList default)"
   uuid="${uuid#\'}"
   uuid="${uuid%\'}"
-  [[ $uuid =~ ^[0-9a-fA-F-]{36}$ ]] || die 'GNOME Terminal 기본 프로필을 확인하세요.'
+  if [[ ! $uuid =~ ^[0-9a-fA-F-]{36}$ ]]; then
+    log 'GNOME Terminal 기본 프로필을 초기화합니다.'
+    gnome-terminal -- /bin/true
+    uuid="$(gsettings get org.gnome.Terminal.ProfilesList default)"
+    uuid="${uuid#\'}"
+    uuid="${uuid%\'}"
+  fi
+  [[ $uuid =~ ^[0-9a-fA-F-]{36}$ ]] || die 'GNOME Terminal 기본 프로필을 초기화하지 못했습니다. GNOME Terminal을 열고 다시 실행하세요.'
   profile="org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$uuid/"
   image_uri="$(python3 -c 'from pathlib import Path; import sys; print(Path(sys.argv[1]).resolve().as_uri())' "$data_dir/backgrounds/background1.jpg")"
   local -a schemas=(org.gnome.desktop.peripherals.keyboard org.gnome.shell.extensions.dash-to-dock

@@ -16,6 +16,8 @@ Ubuntu 26.04 LTS의 HP ZBook Ultra 14 G1a에서 개발, 데스크톱 설정, 네
 ```
 
 - **개발 환경.** Git, Python 3.14 가상환경(`python3.14-venv`), Node.js와 npm은 Ubuntu 패키지로 설치한다. GitHub CLI는 공식 APT 저장소를 사용하고 VS Code는 공식 Snap 패키지로 설치한다. 기존 APT 버전이 있으면 제거 후 다시 실행한다. Docker Engine이 필요하면 `dev --docker`를 실행한다. [Ubuntu Node.js 패키지](https://packages.ubuntu.com/resolute/nodejs) · [GitHub CLI](https://github.com/cli/cli/blob/trunk/docs/install_linux.md) · [VS Code](https://code.visualstudio.com/docs/setup/linux) · [Docker Engine](https://docs.docker.com/engine/install/ubuntu/)
+
+  Docker 설치 시 현재 사용자를 `docker` 그룹에 추가하고 새 그룹 목록을 적용한 사용자 프로세스에서 `docker info`를 확인한다. 현재 로그인 세션에서 권한을 사용하려면 로그아웃한 후 다시 로그인한다. `docker` 그룹은 관리자 수준의 권한을 부여한다.
 - **GNOME.** GNOME Wayland 세션에 Legion5 배경 이미지, 다크 모드, JetBrains Mono 글꼴, 하단 도크와 GNOME Terminal Nord 팔레트를 적용한다. 배경 이미지 6개는 사용자 데이터 디렉터리의 `backgrounds/`에 복사하며 첫 번째 이미지를 사용한다. GNOME Terminal과 글꼴은 Ubuntu 패키지로 설치한다. 출력된 백업 파일을 `bash <백업 파일 경로>`로 실행하면 이전 값을 복원한다.
 - **보안.** Ubuntu의 APT 자동 업데이트 타이머와 unattended-upgrades를 설정하고 UFW 상태를 출력한다. 방화벽을 켜려면 로컬 세션에서 `security --enable-ufw`를 실행한다. [Ubuntu 자동 업데이트](https://ubuntu.com/server/docs/how-to/software/automatic-updates/)
 - **네트워크 모니터링.** Ubuntu APT로 iproute2, DNS 조회, MTR, iftop, tcpdump를 설치하고 로컬 인터페이스 및 수신 소켓을 표시한다. 패킷 캡처는 사용자가 직접 실행한다. [Ubuntu 네트워크 패키지](https://packages.ubuntu.com/resolute/net/)

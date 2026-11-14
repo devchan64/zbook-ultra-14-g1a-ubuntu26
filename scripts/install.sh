@@ -34,7 +34,7 @@ if [[ $domain == all ]]; then
   flock -n "$all_lock" || die '다른 전체 설치가 실행 중입니다.'
   for step in dev gnome security net-monitor ml codex-restart; do
     marker="$step"
-    [[ $step != dev ]] || marker=dev-snap-docker
+    [[ $step != dev ]] || marker=dev-snap-docker-group
     [[ $step != gnome ]] || marker=gnome-nord
     [[ ! -e /run/reboot-required ]] || die '재부팅 후 install.sh all을 다시 실행하세요.'
     if [[ -f $state_dir/all/$marker.done ]]; then
@@ -43,6 +43,7 @@ if [[ $domain == all ]]; then
     fi
     log "단계 실행: $step"
     (
+      trap 'printf "오류: %s 단계가 실패했습니다. 원인을 해결하고 install.sh all을 다시 실행하세요. 이후 단계는 아직 실행되지 않았습니다.\\n" "$step" >&2' ERR
       source "$root/scripts/cmd/$step.sh"
       if [[ $step == dev ]]; then
         main --docker

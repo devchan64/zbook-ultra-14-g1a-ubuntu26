@@ -23,7 +23,16 @@ main() (
   fi
   if [[ $# == 1 ]]; then
     apt_install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-    sudo docker info --format '{{.ServerVersion}}'
+    local username
+    username="$(id -un)"
+    getent group docker >/dev/null || die 'docker 그룹을 찾을 수 없습니다.'
+    if ! id -nG "$username" | tr ' ' '\n' | grep -Fxq docker; then
+      sudo usermod -aG docker "$username"
+    fi
+    sudo -u "$username" -- docker info
+    if ! id -nG | tr ' ' '\n' | grep -Fxq docker; then
+      log '현재 로그인 세션에 Docker 그룹을 적용하려면 로그아웃한 후 다시 로그인하세요.'
+    fi
   fi
   git --version
   gh --version
