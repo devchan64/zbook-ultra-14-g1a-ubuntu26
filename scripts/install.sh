@@ -10,6 +10,7 @@ usage() {
   dev [--docker]             개발 도구 설치
   gnome                      현재 GNOME 세션 설정
   security [--enable-ufw]    자동 보안 업데이트 설정 및 UFW 점검
+  security check             보안 상태와 업데이트 이력 점검
   net-monitor                개발용 네트워크 진단 도구 설치
   ml [setup]                 ROCm, PyTorch, llama.cpp 설치 및 GPU 검증
   ml verify                  AMD GPU와 PyTorch 연산 검증

@@ -8,6 +8,7 @@ Ubuntu 26.04 LTS의 HP ZBook Ultra 14 G1a에서 개발, 데스크톱 설정, 네
 ./scripts/install.sh dev
 ./scripts/install.sh gnome
 ./scripts/install.sh security
+./scripts/install.sh security check
 ./scripts/install.sh net-monitor
 ./scripts/install.sh ml setup
 ./scripts/install.sh ml verify
@@ -20,6 +21,8 @@ Ubuntu 26.04 LTS의 HP ZBook Ultra 14 G1a에서 개발, 데스크톱 설정, 네
   Docker 설치 시 현재 사용자를 `docker` 그룹에 추가하고 새 그룹 목록을 적용한 사용자 프로세스에서 `docker info`를 확인한다. 현재 로그인 세션에서 권한을 사용하려면 로그아웃한 후 다시 로그인한다. `docker` 그룹은 관리자 수준의 권한을 부여한다.
 - **GNOME.** GNOME Wayland 세션에 Legion5 배경 이미지, 다크 모드, JetBrains Mono 글꼴, 하단 도크와 GNOME Terminal Nord 팔레트를 적용한다. 배경 이미지 6개는 사용자 데이터 디렉터리의 `backgrounds/`에 복사하며 첫 번째 이미지를 사용한다. GNOME Terminal과 글꼴은 Ubuntu 패키지로 설치한다. 출력된 백업 파일을 `bash <백업 파일 경로>`로 실행하면 이전 값을 복원한다.
 - **보안.** Ubuntu의 APT 자동 업데이트 타이머와 unattended-upgrades를 설정하고 UFW 상태를 출력한다. 방화벽을 켜려면 로컬 세션에서 `security --enable-ufw`를 실행한다. [Ubuntu 자동 업데이트](https://ubuntu.com/server/docs/how-to/software/automatic-updates/)
+
+  `security check`는 AppArmor 상태, 최근 APT 이력과 자동 업데이트 서비스 로그, TCP·UDP 수신 포트, 실행 중인 Docker 컨테이너의 공개 포트를 출력한다. 로그와 프로세스 정보를 읽기 위해 `sudo` 인증이 필요하다. 일부 항목을 확인하지 못하면 나머지 항목도 출력한 뒤 오류로 종료한다.
 - **네트워크 모니터링.** Ubuntu APT로 iproute2, DNS 조회, MTR, iftop, tcpdump를 설치하고 로컬 인터페이스 및 수신 소켓을 표시한다. 패킷 캡처는 사용자가 직접 실행한다. [Ubuntu 네트워크 패키지](https://packages.ubuntu.com/resolute/net/)
 - **AMD ML.** Ubuntu 기본 7.0 generic 커널과 amdgpu를 사용한다. `ml setup`은 ROCm 10.1의 gfx1151 개발 패키지, AMD PyTorch 2.14.0 휠, llama.cpp v1.0.0 HIP 빌드를 준비한다. GPU 장치 권한 오류가 나면 `/dev/kfd`와 렌더링 장치의 그룹을 확인하고, 그룹 자격이 바뀐 경우 다시 로그인한다. `ml verify`는 GPU 행렬곱 결과를 검사한다. `ml bench`는 로컬 GGUF의 GPU 레이어 오프로딩을 확인하고 프롬프트 처리와 생성 처리량을 로그로 남긴다. [AMD 호환성](https://rocm.docs.amd.com/en/latest/compatibility/compatibility-matrix.html) · [ROCm 설치](https://rocm.docs.amd.com/en/latest/install/rocm.html) · [AMD PyTorch](https://rocm.docs.amd.com/projects/ai-ecosystem/en/latest/frameworks/pytorch/install.html) · [llama.cpp 벤치마크](https://github.com/ggml-org/llama.cpp/blob/v1.0.0/tools/llama-bench/README.md)
 - **Codex Desktop.** 설치된 `/usr/bin/chatgpt`를 사용자 서비스로 관리한다. 관리 중인 앱이 종료되면 5초 뒤 다시 실행한다. 명령 실행 시 앱이 이미 열려 있으면 다음 그래픽 로그인부터 관리한다. 해제하려면 `systemctl --user disable --now chatgpt-restart.service`를 실행한다.
