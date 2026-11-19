@@ -4,7 +4,7 @@ set -Eeuo pipefail
 main() (
   [[ $# == 0 || ( $# == 1 && $1 == --docker ) ]] || die '사용법: install.sh dev [--docker]'
   apt_update
-  apt_install ca-certificates curl gpg git build-essential pkg-config python3.14-venv nodejs npm snapd
+  apt_install ca-certificates curl gpg git build-essential pkg-config python3.14-venv python3-huggingface-hub nodejs npm snapd
 
   apt_source github-cli https://cli.github.com/packages stable \
     https://cli.github.com/packages/githubcli-archive-keyring.gpg gpg

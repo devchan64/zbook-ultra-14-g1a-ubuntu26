@@ -35,10 +35,14 @@ if [[ $domain == all ]]; then
   flock -n "$all_lock" || die '다른 전체 설치가 실행 중입니다.'
   for step in dev gnome security net-monitor ml codex-restart; do
     marker="$step"
-    [[ $step != dev ]] || marker=dev-snap-docker-group
+    [[ $step != dev ]] || marker=dev-snap-docker-group-huggingface
     [[ $step != gnome ]] || marker=gnome-nord
     [[ ! -e /run/reboot-required ]] || die '재부팅 후 install.sh all을 다시 실행하세요.'
     if [[ -f $state_dir/all/$marker.done ]]; then
+      if [[ $step == ml ]]; then
+        log '완료된 ML 설치의 현재 상태를 검증합니다.'
+        ( source "$root/scripts/cmd/ml.sh"; main verify )
+      fi
       log "완료된 단계 건너뜀: $step"
       continue
     fi

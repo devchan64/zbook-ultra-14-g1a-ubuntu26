@@ -8,11 +8,25 @@ bench="$ml_dir/llama.cpp-$llama_tag/build/bin/llama-bench"
 python="$ml_dir/venv-rocm10.1/bin/python"
 
 check_gpu_nodes() {
-  local kernel node driver
+  local kernel node driver module_path loaded_src available_src
   kernel="$(uname -r)"
   [[ $kernel == 7.0.*-generic ]] || die "AMD 지원 Ubuntu 26.04 GA 커널(7.0 generic)이 필요합니다. 현재: $kernel"
+  [[ -d /sys/module/amdgpu ]] || die 'amdgpu 커널 모듈이 로드되지 않았습니다.'
+  module_path="$(modinfo -k "$kernel" -F filename amdgpu)" || die 'amdgpu 모듈 경로를 확인할 수 없습니다.'
+  loaded_src="$(cat /sys/module/amdgpu/srcversion 2>/dev/null || true)"
+  available_src="$(modinfo -k "$kernel" -F srcversion amdgpu)" || die 'amdgpu 모듈 버전을 확인할 수 없습니다.'
+  if [[ -n $loaded_src && -n $available_src && $loaded_src != "$available_src" ]]; then
+    die "현재 로드된 amdgpu와 다음 부팅에 선택될 모듈이 다릅니다: $module_path. 커널 모듈 상태를 확인하고 재부팅 후 다시 실행하세요."
+  fi
+  case "$module_path" in
+    */updates/*|*/extra/*)
+      die "Ubuntu 기본 커널 외부의 amdgpu 모듈이 선택되어 있습니다: $module_path. Ryzen APU에 지원되는 드라이버 구성을 확인하세요."
+      ;;
+    */kernel/*|\(builtin\)) ;;
+    *) die "amdgpu 모듈의 출처를 확인할 수 없습니다: $module_path" ;;
+  esac
   [[ -c /dev/kfd ]] || die 'AMD GPU 장치 /dev/kfd가 없습니다.'
-  [[ -r /dev/kfd && -w /dev/kfd ]] || die '/dev/kfd 권한을 확인하세요. render 및 video 그룹 변경 후에는 다시 로그인하세요.'
+  [[ -r /dev/kfd && -w /dev/kfd ]] || die "/dev/kfd 접근 권한이 없습니다. 장치 그룹과 현재 세션 그룹($(id -nG))을 확인하고, 그룹을 변경했다면 다시 로그인하세요."
   for node in /dev/dri/renderD*; do
     [[ -c $node && -r $node && -w $node ]] || continue
     driver="$(readlink -f "/sys/class/drm/${node##*/}/device/driver")"
@@ -22,6 +36,8 @@ check_gpu_nodes() {
 }
 
 check_rocm() {
+  [[ $(dpkg-query -W -f='${db:Status-Status}' amdrocm-core-dev10.1-gfx1151 2>/dev/null || true) == installed ]] ||
+    die 'ROCm 10.1 개발 패키지가 설치되어 있지 않습니다. install.sh ml setup을 실행하세요.'
   [[ -x $rocm/bin/rocminfo ]] || die '먼저 install.sh ml setup을 실행하세요.'
   local info
   info="$("$rocm/bin/rocminfo")"
@@ -131,6 +147,8 @@ main() {
       check_gpu_nodes
       check_rocm
       verify_torch
+      [[ -x $bench ]] || die 'llama.cpp 벤치마크가 없습니다. install.sh ml setup을 실행하세요.'
+      "$bench" --list-devices
       ;;
     bench)
       [[ $# == 3 && $2 == --model ]] || die '사용법: install.sh ml bench --model 파일.gguf'
